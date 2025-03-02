@@ -1,4 +1,4 @@
-# main.py
+# run_app.py
 import os
 import sys
 import subprocess
@@ -24,7 +24,7 @@ def main():
             import streamlit as st
             st.error("Erro de importação. Verifique se a estrutura do projeto está correta.")
             st.info("Certifique-se de executar este arquivo a partir da raiz do projeto:")
-            st.code("streamlit run main.py")
+            st.code("streamlit run run_app.py")
     else:
         # Estamos sendo executados diretamente pelo Python, então iniciamos o streamlit
         # como um processo separado *uma única vez*

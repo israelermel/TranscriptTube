@@ -96,7 +96,8 @@ class PDFService:
         # Adiciona informações de rodapé
         pdf.set_y(-30)
         pdf.set_font("Arial", 'I', 8)
-        pdf.cell(0, 10, txt="Gerado por TranscriptTube - https://github.com/israelermel/TranscriptTube", 0, 0, 'C')
+        pdf.cell(0, 10, txt="Gerado por TranscriptTube - https://github.com/israelermel/TranscriptTube", border=0, ln=0,
+                 align='C')
 
         # Gera o arquivo com caminho completo
         filename = os.path.join(output_dir, f"{safe_title}.pdf")
