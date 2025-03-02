@@ -180,7 +180,6 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar
 ### Possíveis melhorias
 
 - Adicionar suporte para tradução automática das transcrições
-- Melhorar o layout dos PDFs gerados
 - Adicionar opção para exportar em outros formatos (TXT, Word, etc.)
 - Implementar cache para melhorar a performance com playlists grandes
 - Adicionar autenticação para permitir acesso a vídeos privados
@@ -193,8 +192,8 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 
 ## 📧 Contato
 
-Para dúvidas ou sugestões, entre em contato pelo [GitHub Issues](https://github.com/israelermel/TranscriptTube/issues) ou pelo email seuemail@exemplo.com.
+Para dúvidas ou sugestões, entre em contato pelo [GitHub Issues](https://github.com/israelermel/TranscriptTube/issues) ou pelo email contato@israelermel.com.br.
 
 ---
 
-Feito com ❤️ por [Seu Nome](https://github.com/israelermel)
+Feito com ❤️ por [Israel Ermel](https://github.com/israelermel)
