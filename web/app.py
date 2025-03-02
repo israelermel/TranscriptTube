@@ -36,10 +36,16 @@ class StreamlitApp:
     def run(self):
         """Executa a aplicação Streamlit."""
         self.ui.header()
+
+        # Entrada da URL
         url = self.ui.input_section()
 
+        # Seleção de idiomas
+        languages = self.ui.language_selector()
+
+        # Botão para processar
         if self.ui.action_button():
-            self._process_url(url)
+            self._process_url(url, languages)
 
         # Limpar arquivos temporários
         if 'cleanup_file' in st.session_state and isinstance(st.session_state.cleanup_file, list):
@@ -48,8 +54,13 @@ class StreamlitApp:
 
         self.ui.show_instructions()
 
-    def _process_url(self, url: str):
-        """Processa a URL fornecida pelo usuário."""
+    def _process_url(self, url: str, languages: list):
+        """Processa a URL fornecida pelo usuário.
+
+        Args:
+            url: URL do vídeo ou playlist do YouTube
+            languages: Lista de códigos de idioma selecionados pelo usuário
+        """
         if not url:
             self.ui.show_warning("Por favor, insira uma URL válida")
             return
@@ -65,25 +76,53 @@ class StreamlitApp:
 
             # Verifica se é uma playlist
             if isinstance(video_id, tuple) and video_id[1] == 'playlist':
-                self._process_playlist(video_id[0], progress_bar, status_text)
+                self._process_playlist(video_id[0], languages, progress_bar, status_text)
             else:
-                self._process_video(video_id, progress_bar, status_text)
+                self._process_video(video_id, languages, progress_bar, status_text)
 
         except Exception as e:
             self.ui.show_error(f"Ocorreu um erro: {str(e)}")
             import traceback
             self.ui.show_error(traceback.format_exc())
 
-    def _process_video(self, video_id: str, progress_bar, status_text):
-        """Processa um único vídeo."""
-        self.ui.update_progress(progress_bar, status_text, 0.3, "Processando vídeo...")
+    def _process_video(self, video_id: str, languages: list, progress_bar, status_text):
+        """Processa um único vídeo.
+
+        Args:
+            video_id: ID do vídeo do YouTube
+            languages: Lista de códigos de idioma para as transcrições
+            progress_bar: Barra de progresso do Streamlit
+            status_text: Elemento de texto para status do Streamlit
+        """
+        self.ui.update_progress(progress_bar, status_text, 0.2, "Processando vídeo...")
 
         # Obter detalhes do vídeo
         video = self.youtube_service.get_video_details(video_id)
-        self.ui.update_progress(progress_bar, status_text, 0.5, f"Obtendo transcrição para: {video.title}")
+
+        # Mostrar idiomas disponíveis
+        self.ui.update_progress(progress_bar, status_text, 0.3, "Verificando transcrições disponíveis...")
+        available_transcripts = self.transcript_service.list_available_transcripts(video_id)
+
+        # Se tiver transcrições disponíveis, mostrar ao usuário
+        if available_transcripts:
+            self.ui.show_available_languages(available_transcripts)
+
+            # Verificar se algum dos idiomas selecionados está disponível
+            selected_langs_available = any(
+                transcript['language_code'] in languages
+                for transcript in available_transcripts
+            )
+
+            if not selected_langs_available:
+                self.ui.show_warning(
+                    f"Nenhum dos idiomas selecionados está disponível para este vídeo. "
+                    f"O sistema tentará usar qualquer idioma disponível."
+                )
+
+        self.ui.update_progress(progress_bar, status_text, 0.4, f"Obtendo transcrição para: {video.title}")
 
         # Adicionar transcrição
-        video = self.transcript_service.add_transcript_to_video(video)
+        video = self.transcript_service.add_transcript_to_video(video, languages)
 
         if video.transcript:
             self.ui.update_progress(progress_bar, status_text, 0.8, "Criando PDF...")
@@ -108,10 +147,20 @@ class StreamlitApp:
                 self.ui.show_error("Erro ao criar o arquivo PDF.")
         else:
             self.ui.update_progress(progress_bar, status_text, 1.0, "Processamento concluído!")
-            self.ui.show_warning("Nenhuma transcrição disponível para este vídeo.")
+            self.ui.show_warning(
+                "Nenhuma transcrição disponível para este vídeo nos idiomas selecionados. "
+                "Tente selecionar outros idiomas ou verificar se o vídeo possui legendas."
+            )
 
-    def _process_playlist(self, playlist_id: str, progress_bar, status_text):
-        """Processa uma playlist completa."""
+    def _process_playlist(self, playlist_id: str, languages: list, progress_bar, status_text):
+        """Processa uma playlist completa.
+
+        Args:
+            playlist_id: ID da playlist do YouTube
+            languages: Lista de códigos de idioma para as transcrições
+            progress_bar: Barra de progresso do Streamlit
+            status_text: Elemento de texto para status do Streamlit
+        """
         self.ui.update_progress(progress_bar, status_text, 0.1, "Processando playlist...")
 
         # Obter informações da playlist
@@ -136,7 +185,7 @@ class StreamlitApp:
             )
 
             # Adicionar transcrição
-            video = self.transcript_service.add_transcript_to_video(video)
+            video = self.transcript_service.add_transcript_to_video(video, languages)
 
             if video.transcript:
                 # Criar PDF
@@ -168,4 +217,7 @@ class StreamlitApp:
             st.session_state.cleanup_file = pdf_files + [zip_filename]
         else:
             self.ui.update_progress(progress_bar, status_text, 1.0, "Processamento concluído!")
-            self.ui.show_warning("Nenhuma transcrição foi encontrada para os vídeos desta playlist.")
+            self.ui.show_warning(
+                "Nenhuma transcrição foi encontrada para os vídeos desta playlist nos idiomas selecionados. "
+                "Tente selecionar outros idiomas ou verificar se os vídeos possuem legendas."
+            )
