@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ ENV PYTHONUNBUFFERED=1 \
     STREAMLIT_SERVER_ADDRESS=0.0.0.0
 
 # Comando para iniciar a aplicação
-CMD ["streamlit", "run", "web/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "run_app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.enableCORS=false", "--server.enableXsrfProtection=false"]
 
 # Healthcheck para verificar se a aplicação está funcionando
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
