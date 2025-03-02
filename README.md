@@ -16,20 +16,58 @@ TranscriptTube é um aplicativo construído com Streamlit que permite aos usuár
 - 📄 Exportação das transcrições para arquivos PDF
 - 📦 Compactação de múltiplas transcrições em um único arquivo ZIP
 - 🔄 Interface simples e intuitiva com feedback em tempo real
+- 🐳 Disponível como imagem Docker para fácil implantação
 
-## 🚀 Instalação
+## 🚀 Instalação e Uso
 
-### Pré-requisitos
+Você pode executar o TranscriptTube de três maneiras diferentes:
 
-- Python 3.7+
-- pip (gerenciador de pacotes do Python)
+### Método 1: Usando Docker (Recomendado) 🐳
 
-### Passos para instalação
+A maneira mais fácil de executar o TranscriptTube é usando Docker:
+
+```bash
+docker run -p 8501:8501 israelermel/transcript-tube:latest
+```
+
+Acesse http://localhost:8501 no seu navegador.
+
+### Método 2: Usando Docker Compose 🐙
 
 1. Clone o repositório:
 
 ```bash
-git clone https://github.com/seu-usuario/TranscriptTube.git
+git clone https://github.com/israelermel/TranscriptTube.git
+cd TranscriptTube
+```
+
+2. Inicie a aplicação com Docker Compose:
+
+```bash
+docker-compose up -d
+```
+
+3. Acesse http://localhost:8501 no seu navegador.
+
+Para parar a aplicação:
+
+```bash
+docker-compose down
+```
+
+### Método 3: Instalação Local (Python) 🐍
+
+#### Pré-requisitos
+
+- Python 3.7+
+- pip (gerenciador de pacotes do Python)
+
+#### Passos para instalação
+
+1. Clone o repositório:
+
+```bash
+git clone https://github.com/israelermel/TranscriptTube.git
 cd TranscriptTube
 ```
 
@@ -51,22 +89,32 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 🧠 Uso
-
-1. Execute o aplicativo:
+4. Execute o aplicativo:
 
 ```bash
- python main.py
+python run_app.py
 ```
 
-Isso iniciará o servidor Streamlit. O aplicativo será aberto automaticamente no seu navegador padrão, geralmente em http://localhost:8501.
+## 📱 Como Usar
 
-2. Na interface do aplicativo:
-   - Cole a URL do vídeo ou playlist do YouTube
-   - Selecione os idiomas de preferência para as transcrições
-   - Clique em "Processar"
-   - Aguarde o processamento (a duração varia dependendo do número de vídeos)
-   - Quando concluído, baixe os arquivos PDF ou o arquivo ZIP
+1. Acesse a interface da aplicação no navegador (geralmente em http://localhost:8501)
+2. Cole a URL do vídeo ou playlist do YouTube
+3. Selecione os idiomas de preferência para as transcrições
+4. Clique em "Processar"
+5. Aguarde o processamento (a duração varia dependendo do número de vídeos)
+6. Quando concluído, baixe os arquivos PDF ou o arquivo ZIP
+
+## 🐳 Criando sua própria imagem Docker
+
+Se você deseja construir a imagem Docker localmente:
+
+```bash
+# Construir a imagem
+docker build -t transcript-tube .
+
+# Executar o container
+docker run -p 8501:8501 transcript-tube
+```
 
 ## 🧩 Estrutura do Projeto
 
@@ -90,6 +138,8 @@ TranscriptTube/
 ├── utils/                # Utilitários
 │   ├── __init__.py
 │   └── url_utils.py          # Funções para manipulação de URLs
+├── Dockerfile            # Configuração para build da imagem Docker
+├── docker-compose.yml    # Configuração para execução com Docker Compose
 ├── run_app.py            # Script para execução da aplicação
 ├── requirements.txt      # Dependências do projeto
 └── README.md             # Este arquivo
@@ -106,6 +156,23 @@ As principais dependências do projeto são:
 
 Veja o arquivo `requirements.txt` para a lista completa de dependências.
 
+## 🔧 Configurações Avançadas com Docker
+
+O TranscriptTube pode ser configurado com variáveis de ambiente quando executado com Docker:
+
+```bash
+docker run -p 8501:8501 \
+  -e STREAMLIT_THEME="dark" \
+  -v $(pwd)/downloads:/app/downloads \
+  israelermel/transcript-tube:latest
+```
+
+### Opções de configuração:
+
+- `-p 8501:8501`: Mapeia a porta 8501 do container para a porta 8501 do host
+- `-v $(pwd)/downloads:/app/downloads`: Monta um volume para salvar os arquivos baixados localmente
+- `-e STREAMLIT_THEME="dark"`: Define o tema do Streamlit (opcional)
+
 ## 💡 Contribuindo
 
 Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar pull requests. Para grandes mudanças, por favor, abra primeiro um issue para discutir o que você gostaria de alterar.
@@ -118,6 +185,7 @@ Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou enviar
 - Implementar cache para melhorar a performance com playlists grandes
 - Adicionar autenticação para permitir acesso a vídeos privados
 - Implementar testes unitários e de integração
+- Criar pipeline de CI/CD para construção e publicação automática da imagem Docker
 
 ## 📝 Licença
 
@@ -125,8 +193,8 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 
 ## 📧 Contato
 
-Para dúvidas ou sugestões, entre em contato pelo [GitHub Issues](https://github.com/israelermel/TranscriptTube/issues) ou pelo email contato@israelermel.com.br.
+Para dúvidas ou sugestões, entre em contato pelo [GitHub Issues](https://github.com/israelermel/TranscriptTube/issues) ou pelo email seuemail@exemplo.com.
 
 ---
 
-Feito com ❤️ por [Israel Ermel](https://github.com/israelermel)
+Feito com ❤️ por [Seu Nome](https://github.com/israelermel)
