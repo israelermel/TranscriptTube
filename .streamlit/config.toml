@@ -1,0 +1,21 @@
+[global]
+# Desativar mensagens de telemetria
+disableWatchdogWarning = true
+showWarningOnDirectExecution = false
+
+[server]
+# Configurações do servidor
+enableCORS = false
+enableXsrfProtection = false
+runOnSave = true
+
+[browser]
+# Impedir que o Streamlit colete estatísticas de uso
+gatherUsageStats = false
+
+[theme]
+# Definir tema claro como padrão
+base = "dark"
+
+[ui]
+hideTopBar = false  # Mantém apenas para acesso ao menu de opções se necessário
