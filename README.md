@@ -1,8 +1,8 @@
+![Banner TranscriptTube](./banner_transcriptube.webp)
+
 # TranscriptTube
 
 Um aplicativo web para download de transcrições de vídeos do YouTube em formato PDF.
-
-![Banner TranscriptTube](https://via.placeholder.com/1200x300.png?text=TranscriptTube)
 
 ## 📋 Descrição
 

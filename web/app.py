@@ -1,6 +1,6 @@
 # web/app.py
 import streamlit as st
-import time
+import time  # Certifique-se de que esta linha está presente
 import os
 import sys
 
@@ -42,6 +42,9 @@ class StreamlitApp:
 
         # Seleção de idiomas
         languages = self.ui.language_selector()
+
+        # Opção para manter arquivos
+        keep_files = self.ui.keep_files_option()
 
         # Botão para processar
         if self.ui.action_button():
@@ -133,12 +136,17 @@ class StreamlitApp:
             if pdf_file:
                 self.ui.update_progress(progress_bar, status_text, 1.0, "Processamento concluído!")
 
+                # Use isso para gerar uma chave verdadeiramente única
+                unique_key = f"download_{video_id}_{int(time.time())}"
+
+                # Em _process_video, quando criamos o botão de download do PDF
                 with open(pdf_file, "rb") as f:
                     self.ui.download_button(
                         label=f"Baixar transcrição: {video.title[:30]}...",
                         data=f,
                         file_name=pdf_file,
-                        mime="application/pdf"
+                        mime="application/pdf",
+                        key=unique_key  # Chave única usando o ID do vídeo
                     )
 
                 # Marcar para limpeza posterior
@@ -174,6 +182,9 @@ class StreamlitApp:
         self.ui.show_info(f"Playlist: {playlist.title} - {total_videos} vídeos encontrados")
         pdf_files = []
 
+        # Limpar qualquer área de download anterior
+        download_area = st.empty()
+
         # Processar cada vídeo
         for i, video in enumerate(playlist.videos):
             progress = 0.1 + (0.8 * (i / total_videos))
@@ -203,25 +214,41 @@ class StreamlitApp:
             zip_filename = f"{playlist.title[:50]}_transcricoes.zip"
             zip_path = self.file_service.create_zip(pdf_files, zip_filename)
 
+            # Remover os arquivos PDF individuais após criar o ZIP
+            for pdf_file in pdf_files:
+                if os.path.exists(pdf_file):
+                    try:
+                        os.remove(pdf_file)
+                    except Exception as e:
+                        print(f"Erro ao remover arquivo PDF {pdf_file}: {str(e)}")
+
             self.ui.update_progress(progress_bar, status_text, 1.0, "Processamento concluído!")
 
-            # Exibir informação sobre o arquivo
-            self.ui.show_info(f"Arquivo ZIP criado em: {zip_path}")
+            # Gerar chave única para o botão de download
+            unique_key = f"download_zip_{int(time.time())}"
 
+            # Usar a área reservada para mostrar apenas um botão
             with open(zip_path, "rb") as f:
-                self.ui.download_button(
+                download_area.download_button(
                     label="Baixar todos os PDFs (ZIP)",
                     data=f,
                     file_name=os.path.basename(zip_path),
-                    mime="application/zip"
+                    mime="application/zip",
+                    key=unique_key
                 )
 
-            # NÃO marcar o arquivo ZIP para limpeza, apenas os PDFs individuais
-            # Isso permite que o arquivo ZIP permaneça disponível
-            st.session_state.cleanup_file = pdf_files  # Remova [zip_path] da lista
+            # Verificar se o usuário quer manter os arquivos
+            keep_files = st.session_state.get("keep_files", False)
 
-            # Opcional: Mostrar mensagem informando onde o arquivo está salvo
-            self.ui.show_success(f"O arquivo ZIP também está disponível em: {zip_path}")
+            if keep_files:
+                # Se o usuário quer manter os arquivos, mostrar mensagem
+                self.ui.show_success(f"O arquivo ZIP está disponível em: {zip_path}")
+                # Limpar apenas a referência, não o arquivo
+                if 'cleanup_file' in st.session_state:
+                    del st.session_state.cleanup_file
+            else:
+                # Marcar apenas o ZIP para limpeza posterior (os PDFs já foram removidos)
+                st.session_state.cleanup_file = [zip_path]
         else:
             self.ui.update_progress(progress_bar, status_text, 1.0, "Processamento concluído!")
             self.ui.show_warning(

@@ -146,13 +146,22 @@ class UIComponents:
         st.info(message)
 
     @staticmethod
-    def download_button(label: str, data, file_name: str, mime: str):
-        """Renderiza um botão de download."""
+    def download_button(label: str, data, file_name: str, mime: str, key: str = None):
+        """Renderiza um botão de download.
+
+        Args:
+            label: Texto do botão
+            data: Dados a serem baixados
+            file_name: Nome do arquivo para download
+            mime: Tipo MIME do arquivo
+            key: Identificador único para o botão (opcional)
+        """
         return st.download_button(
             label=label,
             data=data,
             file_name=file_name,
-            mime=mime
+            mime=mime,
+            key=key
         )
 
     @staticmethod
@@ -196,3 +205,9 @@ class UIComponents:
             })
 
         st.table(transcript_data)
+
+    # Adicione isso na classe UIComponents em web/ui_components.py
+    @staticmethod
+    def keep_files_option():
+        """Renderiza a opção para manter os arquivos após o download."""
+        return st.checkbox("Manter arquivos na pasta downloads após o download", value=False, key="keep_files")
