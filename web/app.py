@@ -205,22 +205,23 @@ class StreamlitApp:
 
             self.ui.update_progress(progress_bar, status_text, 1.0, "Processamento concluído!")
 
-            try:
-                with open(zip_path, "rb") as f:
-                    self.ui.download_button(
-                        label="Baixar todos os PDFs (ZIP)",
-                        data=f,
-                        file_name=os.path.basename(zip_path),
-                        mime="application/zip"
-                    )
+            # Exibir informação sobre o arquivo
+            self.ui.show_info(f"Arquivo ZIP criado em: {zip_path}")
 
-                # Marcar para limpeza posterior
-                st.session_state.cleanup_file = pdf_files + [zip_path]
-            except FileNotFoundError:
-                self.ui.show_error(f"Erro ao criar o arquivo ZIP. Caminho não encontrado: {zip_path}")
-                # Mostra informações de debug
-                self.ui.show_info(f"Diretório atual: {os.getcwd()}")
-                self.ui.show_info(f"Arquivos PDF: {pdf_files}")
+            with open(zip_path, "rb") as f:
+                self.ui.download_button(
+                    label="Baixar todos os PDFs (ZIP)",
+                    data=f,
+                    file_name=os.path.basename(zip_path),
+                    mime="application/zip"
+                )
+
+            # NÃO marcar o arquivo ZIP para limpeza, apenas os PDFs individuais
+            # Isso permite que o arquivo ZIP permaneça disponível
+            st.session_state.cleanup_file = pdf_files  # Remova [zip_path] da lista
+
+            # Opcional: Mostrar mensagem informando onde o arquivo está salvo
+            self.ui.show_success(f"O arquivo ZIP também está disponível em: {zip_path}")
         else:
             self.ui.update_progress(progress_bar, status_text, 1.0, "Processamento concluído!")
             self.ui.show_warning(
